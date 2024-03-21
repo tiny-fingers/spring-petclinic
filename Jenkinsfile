@@ -19,9 +19,18 @@ pipeline {
                 }
             }
         }
+        stage('Stop Previous container') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh 'docker stop pet-clinic'
+                    sh 'docker rename pet-clinic backup-pet-clinic'
+                    sh 'exit 1' // This will cause an error, but the pipeline will continue
+                }
+            }
+        }
         stage('Run Docker image') {
             steps {
-                sh 'docker run -p 80:8090 -d petclinic:latest'
+                sh 'docker run -p 80:8090 --name pet-clinic -d petclinic:latest'
             }
             post {
                 success {
@@ -31,6 +40,7 @@ pipeline {
         }
         stage('Cleanup Docker') {
             steps {
+                sh 'docker rm backup-pet-clinic'
                 sh 'docker system prune -f'
             }
         }
