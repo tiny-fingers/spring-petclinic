@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh 'mvn clean package'
             }
         }
         stage('Build Docker image') {
@@ -21,12 +21,17 @@ pipeline {
         }
         stage('Run Docker image') {
             steps {
-                sh 'docker run -p 80:8090 --name pet-clinic -d petclinic:latest'
+                sh 'docker run -p 80:8090 -d petclinic:latest'
             }
             post {
                 success {
                     echo 'Docker image deployed'
                 }
+            }
+        }
+        stage('Cleanup Docker') {
+            steps {
+                sh 'docker system prune -f'
             }
         }
     }
