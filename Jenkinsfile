@@ -24,7 +24,6 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     sh 'docker stop pet-clinic'
                     sh 'docker rename pet-clinic backup-pet-clinic'
-                    sh 'exit 1' // This will cause an error, but the pipeline will continue
                 }
             }
         }
